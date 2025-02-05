@@ -16,32 +16,32 @@
 
         async function connectBLE() {
             try {
-                // Request BLE device
                 const device = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
-                    optionalServices: ['12345678-1234-5678-1234-56789abcdef0'] // Service UUID
+                    optionalServices: ['12345678-1234-5678-1234-56789abcdef0']  // Match ESP32 UUID
                 });
 
-                // Connect to device
                 const server = await device.gatt.connect();
                 const service = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
                 characteristic = await service.getCharacteristic('abcd1234-5678-4321-abcd-56789abcdef1');
 
                 document.getElementById('status').innerText = "Connected to " + device.name;
 
-                //enable notifications
-                characteristic.startNotifications().then(()=>{
+                // Enable Notifications
+                characteristic.startNotifications().then(() => {
                     characteristic.addEventListener('characteristicvaluechanged', handleNotification);
-                    console.log("Connected: Listening for notifications...");
+                    console.log("Listening for notifications...");
                 });
-            }catch(error){
+
+            } catch (error) {
                 console.log("Error:", error);
                 document.getElementById('status').innerText = "Error connecting";
             }
         }
-        function handleNotification(event){
+
+        function handleNotification(event) {
             let value = new TextDecoder().decode(event.target.value);
-            let logItem = document.createElement('li')
+            let logItem = document.createElement('li');
             logItem.textContent = value;
             document.getElementById('log').appendChild(logItem);
         }
