@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 BLE Motion Monitor</title>
+</head>
+<body>
+    <h1>ESP32 BLE Motion Monitor</h1>
+    <button onclick="connectBLE()">Connect to ESP32</button>
+    <p id="status">Not connected</p>
+    <ul id="log"></ul>
+
+    <script>
+        let characteristic;
+
+        async function connectBLE() {
+            try {
+                // Request BLE device
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['12345678-1234-5678-1234-56789abcdef0'] // Service UUID
+                });
+
+                // Connect to device
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('12345678-1234-5678-1234-56789abcdef0');
+                characteristic = await service.getCharacteristic('abcd1234-5678-4321-abcd-56789abcdef1');
+
+                document.getElementById('status').innerText = "Connected to " + device.name;
+
+                // Start listening for notifications
+                characteristic.startNotifications();
+                characteristic.addEventListener('characteristicvaluechanged', event => {
+                    let value = new TextDecoder().decode(event.target.value);
+                    let logItem = document.createElement('li');
+                    logItem.textContent = value;
+                    document.getElementById('log').appendChild(logItem);
+                });
+
+                console.log("Connected to ESP32 BLE!");
+
+            } catch (error) {
+                console.log("Error:", error);
+                document.getElementById('status').innerText = "Error connecting";
+            }
+        }
+    </script>
+</body>
+</html>

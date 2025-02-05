@@ -6,41 +6,7 @@
     <title>ESP32 Bluetooth Monitor</title>
 </head>
 <body>
-    <h1>ESP32 Bluetooth Motion Monitor</h1>
-    <button onclick="connectBluetooth()">Connect to ESP32</button>
-    <p id="status">Not connected</p>
-    <ul id="log"></ul>
-
-    <script>
-        let device, server, service, characteristic;
-        
-        async function connectBluetooth() {
-            try {
-                device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['00001101-0000-1000-8000-00805f9b34fb'] // Standard Serial UUID
-                });
-
-                server = await device.gatt.connect();
-                service = await server.getPrimaryService('00001101-0000-1000-8000-00805f9b34fb');
-                characteristic = await service.getCharacteristic('00001101-0000-1000-8000-00805f9b34fb');
-
-                document.getElementById('status').innerText = "Connected to " + device.name;
-                
-                characteristic.startNotifications().then(() => {
-                    characteristic.addEventListener('characteristicvaluechanged', event => {
-                        let value = new TextDecoder().decode(event.target.value);
-                        let logItem = document.createElement('li');
-                        logItem.textContent = value;
-                        document.getElementById('log').appendChild(logItem);
-                    });
-                });
-
-            } catch (error) {
-                console.log(error);
-                document.getElementById('status').innerText = "Error connecting";
-            }
-        }
-    </script>
+    <a href="ble.html"><h1>ESP32 Bluetooth Motion Monitor BLE Version</h1></a>
+    <a href="ble.html"><h1>ESP32 Bluetooth Motion Monitor Non-BLE Version</h1></a>
 </body>
 </html>
