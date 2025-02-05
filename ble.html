@@ -29,21 +29,21 @@
 
                 document.getElementById('status').innerText = "Connected to " + device.name;
 
-                // Start listening for notifications
-                characteristic.startNotifications();
-                characteristic.addEventListener('characteristicvaluechanged', event => {
-                    let value = new TextDecoder().decode(event.target.value);
-                    let logItem = document.createElement('li');
-                    logItem.textContent = value;
-                    document.getElementById('log').appendChild(logItem);
+                //enable notifications
+                characteristic.startNotifications().then(()=>{
+                    characteristic.addEventListener('characteristicvaluechanged', handleNotification);
+                    console.log("Connected: Listening for notifications...");
                 });
-
-                console.log("Connected to ESP32 BLE!");
-
-            } catch (error) {
+            }catch(error){
                 console.log("Error:", error);
                 document.getElementById('status').innerText = "Error connecting";
             }
+        }
+        function handleNotification(event){
+            let value = new TextDecoder().decode(event.target.value);
+            let logItem = document.createElement('li')
+            logItem.textContent = value;
+            document.getElementById('log').appendChild(logItem);
         }
     </script>
 </body>
